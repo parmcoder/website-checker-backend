@@ -6,4 +6,6 @@ RUN apt-get update && apt-get install make
 
 COPY . .
 
+EXPOSE 3000
+
 CMD make run
