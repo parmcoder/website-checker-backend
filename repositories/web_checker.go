@@ -7,7 +7,7 @@ import (
 	"github.com/smirzaei/parallel"
 )
 
-//go:generate mockgen -destination=mocks/web_checker_repositories.go -package=mocks
+//go:generate mockgen -destination=../mocks/web_checker_repositories.go -package=mocks github.com/parmcoder/website-checker-backend/repositories WebCheckerRepository
 
 type WebCheckerRepository interface {
 	ParallelCheck(list *[]string) ([]int, int)
