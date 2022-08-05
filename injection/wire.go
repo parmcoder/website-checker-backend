@@ -7,11 +7,12 @@ import (
 	"github.com/google/wire"
 
 	"github.com/parmcoder/website-checker-backend/controllers"
+	"github.com/parmcoder/website-checker-backend/repositories"
 	"github.com/parmcoder/website-checker-backend/services"
 )
 
 func initializeCheckerService() services.CheckerService {
-	wire.Build(services.NewCheckerService)
+	wire.Build(repositories.NewWebCheckerRepository, services.NewCheckerService)
 	return services.CheckerServiceImpl{}
 }
 

@@ -8,13 +8,15 @@ package injection
 
 import (
 	"github.com/parmcoder/website-checker-backend/controllers"
+	"github.com/parmcoder/website-checker-backend/repositories"
 	"github.com/parmcoder/website-checker-backend/services"
 )
 
 // Injectors from wire.go:
 
 func initializeCheckerService() services.CheckerService {
-	checkerService := services.NewCheckerService()
+	webCheckerRepository := repositories.NewWebCheckerRepository()
+	checkerService := services.NewCheckerService(webCheckerRepository)
 	return checkerService
 }
 

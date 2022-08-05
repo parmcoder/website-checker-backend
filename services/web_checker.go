@@ -3,12 +3,10 @@ package services
 import (
 	"encoding/csv"
 	"mime/multipart"
-	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"github.com/smirzaei/parallel"
+	"github.com/parmcoder/website-checker-backend/repositories"
 )
 
 type CheckerService interface {
@@ -17,10 +15,13 @@ type CheckerService interface {
 }
 
 type CheckerServiceImpl struct {
+	webCheckerRepository repositories.WebCheckerRepository
 }
 
-func NewCheckerService() CheckerService {
-	return CheckerServiceImpl{}
+func NewCheckerService(w repositories.WebCheckerRepository) CheckerService {
+	return CheckerServiceImpl{
+		webCheckerRepository: w,
+	}
 }
 
 func (c CheckerServiceImpl) ExtractLinesFromCsv(file *multipart.FileHeader) ([]string, error) {
@@ -56,38 +57,12 @@ func (c CheckerServiceImpl) ExtractLinesFromCsv(file *multipart.FileHeader) ([]s
 func (c CheckerServiceImpl) PerformCheck(list *[]string) (siteUps int, downs int, duration time.Duration, err error) {
 	start := time.Now()
 
-	result := parallel.Map(*list, checkLink)
+	result, ups := c.webCheckerRepository.ParallelCheck(list)
 
-	c1 := make(chan int)
-	c2 := make(chan int)
-
-	go sum(result[:len(result)/2], c1)
-	go sum(result[len(result)/2:], c2)
-
-	x, y := <-c1, <-c2 // receive from c1 aND C2
-
-	siteUps = x + y
-	downs = len(result) - x - y
+	siteUps = ups
+	downs = len(result) - ups
 	duration = time.Since(start)
 	duration = time.Duration(duration.Milliseconds())
+
 	return
-}
-
-func checkLink(link string) int {
-	_, err := http.Get(link)
-	if err != nil {
-		logrus.Debug(link, " might be down!")
-		return 0
-	}
-	logrus.Debug(link, " is up!")
-	return 1
-}
-
-func sum(s []int, c chan int) {
-	sum := 0
-	for _, v := range s {
-		sum += v
-	}
-
-	c <- sum
 }

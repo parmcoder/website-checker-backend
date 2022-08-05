@@ -8,6 +8,8 @@ import (
 	"github.com/parmcoder/website-checker-backend/configs"
 )
 
+//go:generate mockgen -destination=mocks/web_checker.go -package=mocks
+
 func (s *ServerImpl) CheckHealthCsv(ctx echo.Context) error {
 
 	file, err := ctx.FormFile("file")
