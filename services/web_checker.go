@@ -28,6 +28,9 @@ func (c CheckerServiceImpl) ExtractLinesFromCsv(records [][]string) ([]string, e
 	var lines []string
 
 	for i := range records {
+		if len(records[i]) == 0 {
+			continue
+		}
 		urlString := records[i][0]
 		_, err := url.ParseRequestURI(urlString)
 		if err != nil {

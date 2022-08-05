@@ -57,9 +57,9 @@
 				
 				<option value="file0">github.com/parmcoder/website-checker-backend/controllers/server.go (100.0%)</option>
 				
-				<option value="file1">github.com/parmcoder/website-checker-backend/controllers/web_checker.go (13.6%)</option>
+				<option value="file1">github.com/parmcoder/website-checker-backend/controllers/web_checker.go (76.2%)</option>
 				
-				<option value="file2">github.com/parmcoder/website-checker-backend/services/web_checker.go (0.0%)</option>
+				<option value="file2">github.com/parmcoder/website-checker-backend/services/web_checker.go (68.8%)</option>
 				
 				</select>
 			</div>
@@ -82,7 +82,6 @@ import (
 )
 
 type Server interface {
-        CheckHealth(echo.Context) error
         CheckHealthCsv(echo.Context) error
 }
 
@@ -104,6 +103,7 @@ func NewServer(params ServerImplParams) Server <span class="cov8" title="1">{
 		<pre class="file" id="file1" style="display: none">package controllers
 
 import (
+        "encoding/csv"
         "net/http"
 
         "github.com/labstack/echo/v4"
@@ -114,16 +114,29 @@ import (
 func (s *ServerImpl) CheckHealthCsv(ctx echo.Context) error <span class="cov8" title="1">{
 
         file, err := ctx.FormFile("file")
-        if err != nil </span><span class="cov8" title="1">{
-                return ctx.JSON(http.StatusInternalServerError, err)
-        }</span>
-
-        <span class="cov0" title="0">lines, err := (*s.checker).ExtractLinesFromCsv(file)
         if err != nil </span><span class="cov0" title="0">{
                 return ctx.JSON(http.StatusInternalServerError, err)
         }</span>
 
-        <span class="cov0" title="0">var listOfSites configs.WebsiteList
+        <span class="cov8" title="1">src, err := file.Open()
+        if err != nil </span><span class="cov0" title="0">{
+                return ctx.JSON(http.StatusInternalServerError, err)
+        }</span>
+
+        <span class="cov8" title="1">defer src.Close()
+
+        csvReader := csv.NewReader(src)
+        records, err := csvReader.ReadAll()
+        if err != nil </span><span class="cov0" title="0">{
+                return ctx.JSON(http.StatusInternalServerError, err)
+        }</span>
+
+        <span class="cov8" title="1">lines, err := (*s.checker).ExtractLinesFromCsv(records)
+        if err != nil </span><span class="cov0" title="0">{
+                return ctx.JSON(http.StatusInternalServerError, err)
+        }</span>
+
+        <span class="cov8" title="1">var listOfSites configs.WebsiteList
 
         listOfSites.Rows = lines
 
@@ -132,30 +145,7 @@ func (s *ServerImpl) CheckHealthCsv(ctx echo.Context) error <span class="cov8" t
                 return ctx.JSON(http.StatusInternalServerError, err)
         }</span>
 
-        <span class="cov0" title="0">response := configs.WebsiteListResponse{
-                Ups:      ups,
-                Downs:    down,
-                Duration: duration,
-        }
-
-        return ctx.JSON(http.StatusOK, response)</span>
-}
-
-func (s *ServerImpl) CheckHealth(ctx echo.Context) error <span class="cov0" title="0">{
-
-        var listOfSites configs.WebsiteList
-
-        err := ctx.Bind(&amp;listOfSites)
-        if err != nil </span><span class="cov0" title="0">{
-                return ctx.JSON(http.StatusBadRequest, err)
-        }</span>
-
-        <span class="cov0" title="0">ups, down, duration, err := (*s.checker).PerformCheck(&amp;listOfSites.Rows)
-        if err != nil </span><span class="cov0" title="0">{
-                return ctx.JSON(http.StatusInternalServerError, err)
-        }</span>
-
-        <span class="cov0" title="0">response := configs.WebsiteListResponse{
+        <span class="cov8" title="1">response := configs.WebsiteListResponse{
                 Ups:      ups,
                 Downs:    down,
                 Duration: duration,
@@ -168,8 +158,6 @@ func (s *ServerImpl) CheckHealth(ctx echo.Context) error <span class="cov0" titl
 		<pre class="file" id="file2" style="display: none">package services
 
 import (
-        "encoding/csv"
-        "mime/multipart"
         "net/url"
         "time"
 
@@ -180,37 +168,23 @@ import (
 
 type CheckerService interface {
         PerformCheck(list *[]string) (siteUps int, downs int, duration time.Duration, err error)
-        ExtractLinesFromCsv(file *multipart.FileHeader) ([]string, error)
+        ExtractLinesFromCsv(records [][]string) ([]string, error)
 }
 
 type CheckerServiceImpl struct {
         webCheckerRepository repositories.WebCheckerRepository
 }
 
-func NewCheckerService(w repositories.WebCheckerRepository) CheckerService <span class="cov0" title="0">{
+func NewCheckerService(w repositories.WebCheckerRepository) CheckerService <span class="cov8" title="1">{
         return CheckerServiceImpl{
                 webCheckerRepository: w,
         }
 }</span>
 
-func (c CheckerServiceImpl) ExtractLinesFromCsv(file *multipart.FileHeader) ([]string, error) <span class="cov0" title="0">{
+func (c CheckerServiceImpl) ExtractLinesFromCsv(records [][]string) ([]string, error) <span class="cov8" title="1">{
         var lines []string
 
-        src, err := file.Open()
-        if err != nil </span><span class="cov0" title="0">{
-                return lines, err
-        }</span>
-
-        <span class="cov0" title="0">defer src.Close()
-
-        csvReader := csv.NewReader(src)
-        records, err := csvReader.ReadAll()
-
-        if err != nil </span><span class="cov0" title="0">{
-                return lines, err
-        }</span>
-
-        <span class="cov0" title="0">for i := range records </span><span class="cov0" title="0">{
+        for i := range records </span><span class="cov0" title="0">{
                 urlString := records[i][0]
                 _, err := url.ParseRequestURI(urlString)
                 if err != nil </span><span class="cov0" title="0">{
@@ -220,10 +194,10 @@ func (c CheckerServiceImpl) ExtractLinesFromCsv(file *multipart.FileHeader) ([]s
                 }</span>
         }
 
-        <span class="cov0" title="0">return lines, nil</span>
+        <span class="cov8" title="1">return lines, nil</span>
 }
 
-func (c CheckerServiceImpl) PerformCheck(list *[]string) (siteUps int, downs int, duration time.Duration, err error) <span class="cov0" title="0">{
+func (c CheckerServiceImpl) PerformCheck(list *[]string) (siteUps int, downs int, duration time.Duration, err error) <span class="cov8" title="1">{
         start := time.Now()
 
         result, ups := c.webCheckerRepository.ParallelCheck(list)
