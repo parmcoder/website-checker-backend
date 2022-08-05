@@ -1,13 +1,19 @@
 module github.com/parmcoder/website-checker-backend
 
-replace github.com/parmcoder/website-checker-backend/commands => ../commands
-
 go 1.18
 
 require (
 	github.com/joho/godotenv v1.4.0
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
+)
+
+require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/google/subcommands v1.0.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/tools v0.0.0-20190422233926-fe54fb35175b // indirect
 )
 
 require (

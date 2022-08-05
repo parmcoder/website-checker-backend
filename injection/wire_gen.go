@@ -21,12 +21,12 @@ func initializeCheckerService() services.CheckerService {
 func InitializeServerParams() controllers.ServerImplParams {
 	checkerService := initializeCheckerService()
 	serverImplParams := controllers.ServerImplParams{
-		checker: checkerService,
+		Checker: checkerService,
 	}
 	return serverImplParams
 }
 
-func initializeServer() controllers.Server {
+func InitializeServer() controllers.Server {
 	serverImplParams := InitializeServerParams()
 	server := controllers.NewServer(serverImplParams)
 	return server

@@ -20,7 +20,7 @@ func InitializeServerParams() controllers.ServerImplParams {
 	return controllers.ServerImplParams{}
 }
 
-func initializeServer() controllers.Server {
+func InitializeServer() controllers.Server {
 	wire.Build(controllers.NewServer, InitializeServerParams)
 	return &controllers.ServerImpl{}
 }

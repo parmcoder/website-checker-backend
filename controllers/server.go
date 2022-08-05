@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
 
 	"github.com/parmcoder/website-checker-backend/services"
 )
@@ -11,7 +11,7 @@ type Server interface {
 }
 
 type ServerImplParams struct {
-	checker services.CheckerService
+	Checker services.CheckerService
 }
 
 type ServerImpl struct {
@@ -20,6 +20,6 @@ type ServerImpl struct {
 
 func NewServer(params ServerImplParams) Server {
 	return &ServerImpl{
-		checker: &params.checker,
+		checker: &params.Checker,
 	}
 }
