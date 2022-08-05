@@ -61,7 +61,7 @@ lint:
 
 .SILENT: test
 test:
-	go test -cover ./... -coverprofile=coverage.out -v -test.v
+	go test -cover ./services ./controllers -coverprofile=coverage.out -v -test.v
 
 # Docker
 
