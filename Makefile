@@ -89,6 +89,11 @@ run:
 cover:
 	go tool cover --html=./coverage.out
 
+# Inject dependencies
+.SILENT: wire
+wire:
+	cd injection/ && go generate
+
 # Default
 
 .DEFAULT_GOAL := help
