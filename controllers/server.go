@@ -7,16 +7,15 @@ import (
 )
 
 type Server interface {
-	CheckHealth(echo.Context) error
 	CheckHealthCsv(echo.Context) error
-}
-
-type ServerImplParams struct {
-	Checker services.CheckerService
 }
 
 type ServerImpl struct {
 	checker *services.CheckerService
+}
+
+type ServerImplParams struct {
+	Checker services.CheckerService
 }
 
 func NewServer(params ServerImplParams) Server {

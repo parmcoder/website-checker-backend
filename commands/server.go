@@ -33,6 +33,5 @@ func serverInitialize() {
 }
 
 func handleServer(e *echo.Echo, server *controllers.Server) {
-	e.POST("/text", (*server).CheckHealth)
 	e.POST("/csv", (*server).CheckHealthCsv)
 }

@@ -1,8 +1,6 @@
 package services
 
 import (
-	"encoding/csv"
-	"mime/multipart"
 	"net/url"
 	"time"
 
@@ -13,7 +11,7 @@ import (
 
 type CheckerService interface {
 	PerformCheck(list *[]string) (siteUps int, downs int, duration time.Duration, err error)
-	ExtractLinesFromCsv(file *multipart.FileHeader) ([]string, error)
+	ExtractLinesFromCsv(records [][]string) ([]string, error)
 }
 
 type CheckerServiceImpl struct {
@@ -26,22 +24,8 @@ func NewCheckerService(w repositories.WebCheckerRepository) CheckerService {
 	}
 }
 
-func (c CheckerServiceImpl) ExtractLinesFromCsv(file *multipart.FileHeader) ([]string, error) {
+func (c CheckerServiceImpl) ExtractLinesFromCsv(records [][]string) ([]string, error) {
 	var lines []string
-
-	src, err := file.Open()
-	if err != nil {
-		return lines, err
-	}
-
-	defer src.Close()
-
-	csvReader := csv.NewReader(src)
-	records, err := csvReader.ReadAll()
-
-	if err != nil {
-		return lines, err
-	}
 
 	for i := range records {
 		urlString := records[i][0]

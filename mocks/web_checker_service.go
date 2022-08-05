@@ -5,7 +5,6 @@
 package mocks
 
 import (
-	multipart "mime/multipart"
 	reflect "reflect"
 	time "time"
 
@@ -36,7 +35,7 @@ func (m *MockCheckerService) EXPECT() *MockCheckerServiceMockRecorder {
 }
 
 // ExtractLinesFromCsv mocks base method.
-func (m *MockCheckerService) ExtractLinesFromCsv(arg0 *multipart.FileHeader) ([]string, error) {
+func (m *MockCheckerService) ExtractLinesFromCsv(arg0 [][]string) ([]string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExtractLinesFromCsv", arg0)
 	ret0, _ := ret[0].([]string)

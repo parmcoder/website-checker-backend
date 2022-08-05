@@ -87,7 +87,7 @@ run:
 
 .SILENT: cover
 cover:
-	go tool cover --html=./coverage.out
+	go tool cover -html=./coverage.out -o cover.html && open cover.html
 
 # Inject dependencies
 .SILENT: wire
