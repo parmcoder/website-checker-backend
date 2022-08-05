@@ -92,7 +92,13 @@ cover:
 # Inject dependencies
 .SILENT: wire
 wire:
-	cd injection/ && go generate
+	go generate ./injection
+
+# Create mocks
+.SILENT: lzm
+lzm:
+	go generate ./repositories ./services
+
 
 # Default
 

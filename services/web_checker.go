@@ -9,6 +9,8 @@ import (
 	"github.com/parmcoder/website-checker-backend/repositories"
 )
 
+//go:generate mockgen -destination=mocks/web_checker_service.go -package=mocks
+
 type CheckerService interface {
 	PerformCheck(list *[]string) (siteUps int, downs int, duration time.Duration, err error)
 	ExtractLinesFromCsv(file *multipart.FileHeader) ([]string, error)
