@@ -1,7 +1,10 @@
 package services
 
 import (
+	"encoding/csv"
+	"mime/multipart"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -10,6 +13,7 @@ import (
 
 type CheckerService interface {
 	PerformCheck(list *[]string) (siteUps int, downs int, duration time.Duration, err error)
+	ExtractLinesFromCsv(file *multipart.FileHeader) ([]string, error)
 }
 
 type CheckerServiceImpl struct {
@@ -17,6 +21,36 @@ type CheckerServiceImpl struct {
 
 func NewCheckerService() CheckerService {
 	return CheckerServiceImpl{}
+}
+
+func (c CheckerServiceImpl) ExtractLinesFromCsv(file *multipart.FileHeader) ([]string, error) {
+	var lines []string
+
+	src, err := file.Open()
+	if err != nil {
+		return lines, err
+	}
+
+	defer src.Close()
+
+	csvReader := csv.NewReader(src)
+	records, err := csvReader.ReadAll()
+
+	if err != nil {
+		return lines, err
+	}
+
+	for i := range records {
+		urlString := records[i][0]
+		_, err := url.ParseRequestURI(urlString)
+		if err != nil {
+			lines = append(lines, "https://"+records[i][0])
+		} else {
+			lines = append(lines, records[i][0])
+		}
+	}
+
+	return lines, nil
 }
 
 func (c CheckerServiceImpl) PerformCheck(list *[]string) (siteUps int, downs int, duration time.Duration, err error) {
@@ -42,10 +76,10 @@ func (c CheckerServiceImpl) PerformCheck(list *[]string) (siteUps int, downs int
 func checkLink(link string) int {
 	_, err := http.Get(link)
 	if err != nil {
-		logrus.Info(link, " might be down!")
+		logrus.Debug(link, " might be down!")
 		return 0
 	}
-	logrus.Info(link, " is up!")
+	logrus.Debug(link, " is up!")
 	return 1
 }
 

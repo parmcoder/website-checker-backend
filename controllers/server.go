@@ -8,6 +8,7 @@ import (
 
 type Server interface {
 	CheckHealth(echo.Context) error
+	CheckHealthCsv(echo.Context) error
 }
 
 type ServerImplParams struct {

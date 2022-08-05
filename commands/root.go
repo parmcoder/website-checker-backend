@@ -33,6 +33,7 @@ func initConfig() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	logrus.SetLevel(logrus.ErrorLevel)
 	logrus.Info(os.Getenv("APP_ENV"))
 	logrus.Info(os.Getenv("PORT"))
 }
