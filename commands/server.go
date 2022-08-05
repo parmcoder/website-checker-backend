@@ -4,7 +4,7 @@ import (
 	"os"
 
 	echo "github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/cobra"
 
 	"github.com/parmcoder/website-checker-backend/controllers"
@@ -16,8 +16,6 @@ var serverCmd = &cobra.Command{
 	Short: "Server command",
 	Long:  "Run the server using Echo v4",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
-		logrus.Info("Running server")
 		serverInitialize()
 	},
 }
@@ -26,10 +24,14 @@ func serverInitialize() {
 	e := echo.New()
 	server := injection.InitializeServer()
 
-	e.POST("/", server.CheckHealth)
+	handleServer(e, &server)
+
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
 	e.Logger.Fatal(e.Start("0.0.0.0:" + os.Getenv("PORT")))
 }
 
-func handleServer(e echo.Context, server controllers.Server) {
+func handleServer(e *echo.Echo, server *controllers.Server) {
+	e.POST("/", (*server).CheckHealth)
 }
