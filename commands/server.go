@@ -28,6 +28,7 @@ func serverInitialize() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
 	e.Logger.Fatal(e.Start("0.0.0.0:" + os.Getenv("PORT")))
 }
